@@ -8,9 +8,11 @@ rocketd_FILES = rocketd.c
 rocketd_CFLAGS = -fblocks
 rocketd_FRAMEWORKS = CoreFoundation
 rocketd_INSTALL_PATH = /usr/libexec
+rocketd_CODESIGN_FLAGS = -Sentitlements.plist
 
 _rocketd_reenable_FILES = rocketd_reenable.c
 _rocketd_reenable_INSTALL_PATH = /usr/libexec
+_rocketd_reenable_CODESIGN_FLAGS = -Sentitlements.plist
 
 ADDITIONAL_CFLAGS = -std=c99 -Ioverlayheaders
 
