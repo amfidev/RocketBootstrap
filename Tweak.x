@@ -43,6 +43,14 @@ static kern_return_t rocketbootstrap_look_up_with_timeout(mach_port_t bp, const 
 #ifdef DEBUG
 	NSLog(@"RocketBootstrap: rocketbootstrap_look_up(%llu, %s, %p)", (unsigned long long)bp, service_name, sp);
 #endif
+	if (kCFCoreFoundationVersionNumber >= 1556.00) {
+		if (strlen(service_name) > 3 && service_name[0] != 'c' && service_name[1] != 'y' && service_name[2] != ':') {
+			char new_name[strlen(service_name) + 3];
+			sprintf(new_name, "cy:%s", service_name);
+			strncpy((char *)service_name, new_name, strlen(new_name));
+		}
+		return bootstrap_look_up(bp, service_name, sp);
+	}
 	if (rocketbootstrap_is_passthrough() || isDaemon) {
 		if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_5_0) {
 			int sandbox_result = sandbox_check(getpid(), "mach-lookup", SANDBOX_FILTER_LOCAL_NAME | SANDBOX_CHECK_NO_REPORT, service_name);
@@ -158,6 +166,14 @@ kern_return_t rocketbootstrap_unlock(const name_t service_name)
 #endif
 	if (rocketbootstrap_is_passthrough())
 		return 0;
+	if (kCFCoreFoundationVersionNumber >= 1556.00) {
+		if (strlen(service_name) > 3 && service_name[0] != 'c' && service_name[1] != 'y' && service_name[2] != ':') {
+			char new_name[strlen(service_name) + 3];
+			sprintf(new_name, "cy:%s", service_name);
+			strncpy((char *)service_name, new_name, strlen(new_name));
+			return sandbox_check(getpid(), "mach-lookup", SANDBOX_FILTER_LOCAL_NAME | SANDBOX_CHECK_NO_REPORT, service_name);
+		}
+	}
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSString *serviceNameString = [NSString stringWithUTF8String:service_name];
 	unfair_lock_lock(&namesLock);
